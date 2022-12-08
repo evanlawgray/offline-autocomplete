@@ -19,6 +19,7 @@
     "paths": {
       "@components*": ["components/*"],
       "@types*": ["types/*"],
+      "@util*": ["util/*"]
     }
   },
   "include": ["src"],
