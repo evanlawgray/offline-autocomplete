@@ -1,4 +1,6 @@
-export class PrefixTree {
+import { OptionsDataStore } from '@typesindex';
+
+export class PrefixTree implements OptionsDataStore {
   value: string | null;
   isComplete: boolean;
   children: Record<string, PrefixTree>;
@@ -47,7 +49,7 @@ export class PrefixTree {
     let rootNode = this;
 
     for (let i = 0; i < prefix.length; i++) {
-      rootNode = rootNode.children[prefix[i]];
+      rootNode = rootNode?.children?.[prefix[i]];
     }
 
     const recursivePush = (

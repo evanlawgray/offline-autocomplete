@@ -1,1 +1,1 @@
-export * from './PrefixTree';
+export * from './prefix-tree/PrefixTree';
