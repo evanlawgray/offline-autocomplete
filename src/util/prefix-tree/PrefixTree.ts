@@ -1,11 +1,11 @@
-import { OptionsDataStore } from '@typesindex';
+import { OptionsDataStore } from '@type/index';
 
 export class PrefixTree implements OptionsDataStore {
   value: string | null;
   isComplete: boolean;
   children: Record<string, PrefixTree>;
 
-  constructor(value: string | null = null, isComplete: boolean = false) {
+  constructor(value: string | null = null, isComplete = false) {
     this.value = value;
     this.isComplete = isComplete;
     this.children = {};

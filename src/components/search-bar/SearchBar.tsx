@@ -1,4 +1,4 @@
-import { OptionsDataStore, SearchOption } from '@typesindex';
+import { OptionsDataStore, SearchOption } from '@type/index';
 import React, { useCallback, useState } from 'react';
 
 const INPUT_ID = 'search-input';
@@ -8,13 +8,13 @@ interface SearchBarProps {
 }
 
 export const SearchBar = (props: SearchBarProps) => {
-  console.log('TRIE:', JSON.stringify(props.optionsDataStore));
   const [searchTerm, setSearchTerm] = useState('');
   const [options, setOptions] = useState<string[]>([]);
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       event.persist();
+
       const {
         target: { value: text }
       } = event;
@@ -63,6 +63,7 @@ export const SearchBar = (props: SearchBarProps) => {
         <ul className="search-form__suggestions-list">
           {options.map((text) => (
             <li
+              key={text}
               className="search-form__suggestions-list-item"
               onClick={() => handleSelect(text)}
             >

@@ -6,5 +6,5 @@ export interface OptionsDataStore {
 
 export interface SearchOption {
   text: string;
-  searches: number;
+  numberOfSearches: number;
 }
