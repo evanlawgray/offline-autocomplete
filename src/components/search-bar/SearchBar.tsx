@@ -1,13 +1,14 @@
-import { OptionsDataStore, SearchOption } from '@type/index';
+import { persistPrefixTree } from '@util/indexedDB/persistPrefixTree';
+import { prefixTreeSingleton } from '@util/prefix-tree';
 import React, { useCallback, useState } from 'react';
 
 const INPUT_ID = 'search-input';
 
-interface SearchBarProps {
-  optionsDataStore: OptionsDataStore;
+interface ISearchBarProps {
+  setErrors: (errors: string | string[]) => void;
 }
 
-export const SearchBar = (props: SearchBarProps) => {
+export const SearchBar = (props: ISearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [options, setOptions] = useState<string[]>([]);
 
@@ -20,27 +21,29 @@ export const SearchBar = (props: SearchBarProps) => {
       } = event;
       setSearchTerm(text);
 
-      const newOptions = props.optionsDataStore.getAllWithPrefix(text);
+      const newOptions = prefixTreeSingleton.getAllWithPrefix(text);
 
       setOptions(newOptions ?? []);
     },
-    [props.optionsDataStore, setSearchTerm, setOptions]
+    [prefixTreeSingleton, setSearchTerm, setOptions]
   );
 
   const handleSelect = useCallback(
     (text: string) => {
       setSearchTerm(text);
     },
-    [props.optionsDataStore]
+    [prefixTreeSingleton]
   );
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      props.optionsDataStore.insert(searchTerm);
+      prefixTreeSingleton.insert(searchTerm);
+
+      persistPrefixTree(prefixTreeSingleton.toRawObject(), props.setErrors);
     },
-    [searchTerm, props.optionsDataStore]
+    [searchTerm, prefixTreeSingleton]
   );
 
   return (

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 import { SearchBar } from '@components/search-bar';
 import { initDB } from '@util/indexedDB';
-import { prefixTreeSingleton } from '@util/prefix-tree';
 
 import './App.css';
 
@@ -30,7 +29,7 @@ function App() {
 
   return (
     <div className="main-content">
-      <SearchBar optionsDataStore={prefixTreeSingleton} />
+      <SearchBar setErrors={handleSetErrors} />
     </div>
   );
 }
