@@ -30,28 +30,32 @@ export class PrefixTree implements OptionsDataStore {
   }
 
   insert(this: PrefixTree, word: string): void {
+    const lowercaseWord = word.toLocaleLowerCase();
+
     let curr = this.root;
 
-    for (let i = 0; i < word.length; i++) {
-      const match = curr.children[word[i]];
+    for (let i = 0; i < lowercaseWord.length; i++) {
+      const match = curr.children[lowercaseWord[i]];
 
       if (!match) {
-        curr.children[word[i]] = new Node(word[i]);
+        curr.children[lowercaseWord[i]] = new Node(lowercaseWord[i]);
       }
 
-      if (i === word.length - 1) {
-        curr.children[word[i]].isComplete = true;
+      if (i === lowercaseWord.length - 1) {
+        curr.children[lowercaseWord[i]].isComplete = true;
       }
 
-      curr = curr.children[word[i]];
+      curr = curr.children[lowercaseWord[i]];
     }
   }
 
   search(this: PrefixTree, word: string): boolean {
+    const lowercaseWord = word.toLocaleLowerCase();
+
     let curr = this.root;
 
-    for (let i = 0; i < word.length; i++) {
-      const match = curr.children[word[i]];
+    for (let i = 0; i < lowercaseWord.length; i++) {
+      const match = curr.children[lowercaseWord[i]];
 
       if (!match) return false;
 
@@ -62,12 +66,14 @@ export class PrefixTree implements OptionsDataStore {
   }
 
   getAllWithPrefix(this: PrefixTree, prefix: string): string[] {
+    const lowercasePrefix = prefix.toLocaleLowerCase();
+
     const result: string[] = [];
 
     let rootNode = this.root;
 
-    for (let i = 0; i < prefix.length; i++) {
-      rootNode = rootNode?.children?.[prefix[i]];
+    for (let i = 0; i < lowercasePrefix.length; i++) {
+      rootNode = rootNode?.children?.[lowercasePrefix[i]];
     }
 
     const recursivePush = (
@@ -83,7 +89,7 @@ export class PrefixTree implements OptionsDataStore {
       );
     };
 
-    recursivePush(rootNode, prefix);
+    recursivePush(rootNode, lowercasePrefix);
 
     return result;
   }
