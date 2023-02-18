@@ -1,6 +1,8 @@
-import { persistPrefixTree } from '@util/indexedDB/persistPrefixTree';
-import { AutocompleteStore } from '@util/autocomplete-store';
 import React, { useCallback, useState } from 'react';
+
+import { AutocompleteStore } from '@util/autocomplete-store';
+import { persistPrefixTree } from '@util/indexedDB/persistPrefixTree';
+import { SearchOption } from '@type/index';
 
 const INPUT_ID = 'search-input';
 
@@ -11,7 +13,7 @@ interface ISearchBarProps {
 
 export const SearchBar = (props: ISearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [options, setOptions] = useState<string[]>([]);
+  const [options, setOptions] = useState<SearchOption[]>([]);
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,27 +26,42 @@ export const SearchBar = (props: ISearchBarProps) => {
 
       const newOptions = props.autoCompleteStore
         .getInstance()
-        .getAllWithPrefix(text);
+        .getAllWithPrefix(text)
+        .sort((optionA, optionB) => optionB.searchCount - optionA.searchCount);
 
       setOptions(newOptions ?? []);
     },
     [props.autoCompleteStore, setSearchTerm, setOptions]
   );
 
-  const handleSelect = useCallback((text: string) => {
-    setSearchTerm(text);
-  }, []);
-
-  const handleSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-
+  const handleSearch = useCallback(
+    (searchTerm: string) => {
       props.autoCompleteStore.getInstance().insert(searchTerm);
 
       persistPrefixTree(
         props.autoCompleteStore.getInstance().toRawObject(),
         props.setErrors
       );
+
+      const newOptions = props.autoCompleteStore
+        .getInstance()
+        .getAllWithPrefix(searchTerm)
+        .sort((optionA, optionB) => optionB.searchCount - optionA.searchCount);
+      setOptions(newOptions);
+    },
+    [props.autoCompleteStore, props.setErrors, setOptions]
+  );
+
+  const handleSelect = useCallback((text: string) => {
+    setSearchTerm(text);
+    handleSearch(text);
+  }, []);
+
+  const handleSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      handleSearch(searchTerm);
     },
     [searchTerm, props.autoCompleteStore]
   );
@@ -67,13 +84,13 @@ export const SearchBar = (props: ISearchBarProps) => {
         />
 
         <ul className="search-form__suggestions-list">
-          {options.map((text) => (
+          {options.map(({ searchTerm }) => (
             <li
-              key={text}
+              key={searchTerm}
               className="search-form__suggestions-list-item"
-              onClick={() => handleSelect(text)}
+              onClick={() => handleSelect(searchTerm)}
             >
-              {text}
+              {searchTerm}
             </li>
           ))}
         </ul>

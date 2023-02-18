@@ -14,14 +14,14 @@ export class AutocompleteStore {
 
     if (!AutocompleteStore.#instance) {
       try {
-        const { value, isComplete, children } = await getPrefixTreeData(
+        const persistedTreeData = await getPrefixTreeData(
           AutocompleteStore.#db
         );
 
         AutocompleteStore.#instance = new PrefixTree(
-          value,
-          isComplete,
-          children
+          persistedTreeData?.value,
+          persistedTreeData?.isComplete,
+          persistedTreeData?.children
         );
 
         return AutocompleteStore.#instance;

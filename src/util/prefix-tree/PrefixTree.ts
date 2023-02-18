@@ -1,14 +1,16 @@
-import { PrefixTreeNode } from '@type/index';
+import { PrefixTreeNode, SearchOption } from '@type/index';
 
 export class Node implements PrefixTreeNode {
   value: string | null;
   isComplete: boolean;
   children: Record<string, PrefixTreeNode>;
+  searchCount: number;
 
-  constructor(value: string | null = null, isComplete = false) {
+  constructor(value: string | null = null, isComplete = false, children = {}) {
     this.value = value;
     this.isComplete = isComplete;
-    this.children = {};
+    this.children = children;
+    this.searchCount = 0;
   }
 }
 
@@ -20,13 +22,7 @@ export class PrefixTree {
     isComplete = false,
     children: Record<string, Node> = {}
   ) {
-    const root = {
-      value,
-      isComplete,
-      children
-    };
-
-    this.root = root;
+    this.root = new Node(value, isComplete, children);
   }
 
   insert(this: PrefixTree, word: string): void {
@@ -43,9 +39,10 @@ export class PrefixTree {
 
       if (i === lowercaseWord.length - 1) {
         curr.children[lowercaseWord[i]].isComplete = true;
+        curr.children[lowercaseWord[i]].searchCount++;
       }
 
-      curr = curr.children[lowercaseWord[i]];
+      curr = match;
     }
   }
 
@@ -65,10 +62,10 @@ export class PrefixTree {
     return curr?.isComplete ? true : false;
   }
 
-  getAllWithPrefix(this: PrefixTree, prefix: string): string[] {
+  getAllWithPrefix(this: PrefixTree, prefix: string): SearchOption[] {
     const lowercasePrefix = prefix.toLocaleLowerCase();
 
-    const result: string[] = [];
+    const result: SearchOption[] = [];
 
     let rootNode = this.root;
 
@@ -82,7 +79,11 @@ export class PrefixTree {
     ): void => {
       if (!node) return;
 
-      if (node.isComplete && node.value) result.push(baseString);
+      if (node.isComplete && node.value)
+        result.push({
+          searchTerm: baseString,
+          searchCount: node.searchCount
+        });
 
       Object.values(node.children).forEach((childNode) =>
         recursivePush(childNode, `${baseString}${childNode.value}`)

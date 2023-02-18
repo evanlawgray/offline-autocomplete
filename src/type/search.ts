@@ -2,9 +2,10 @@ export interface PrefixTreeNode {
   value: string | null;
   isComplete: boolean;
   children: Record<string, PrefixTreeNode>;
+  searchCount: number;
 }
 
 export interface SearchOption {
-  text: string;
-  numberOfSearches: number;
+  searchTerm: string;
+  searchCount: number;
 }

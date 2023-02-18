@@ -1,5 +1,5 @@
 export const DATABASE_NAME = 'autocomplete-database';
-export const DATABASE_VERSION = 3;
+export const DATABASE_VERSION = 4;
 export const OBJECT_STORE_NAMES = {
   PREFIX_TREE: 'prefix-tree-store'
 };
