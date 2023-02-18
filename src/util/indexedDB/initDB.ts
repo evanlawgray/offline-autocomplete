@@ -1,14 +1,7 @@
-import { PrefixTreeNode } from '@type/index';
+import { IDBErrorEventTarget } from '@type/db';
 import { AutocompleteStore } from '@util/autocomplete-store/AutocompleteStore';
-import {
-  DATABASE_NAME,
-  DATABASE_VERSION,
-  ERROR_MESSAGES,
-  OBJECT_STORE_NAMES
-} from './constants';
-
-type IDBOpenEventTarget = EventTarget & { result: IDBDatabase };
-type IDBErrorEventTarget = EventTarget & { errorCode: string };
+import { DATABASE_NAME, DATABASE_VERSION, ERROR_MESSAGES } from './constants';
+import { updateDB } from './updateDB';
 
 export let db: IDBDatabase | undefined;
 
@@ -30,39 +23,7 @@ export function initDB(storeErrors: (errors: string | string[]) => void) {
     AutocompleteStore.init();
   };
 
-  openRequest.onupgradeneeded = updateOrCreateDB;
+  openRequest.onupgradeneeded = updateDB;
 
   return db;
-}
-
-export function getPrefixTreeData(db: IDBDatabase): Promise<PrefixTreeNode> {
-  return new Promise((resolve, reject) => {
-    const objectStore = db
-      .transaction([OBJECT_STORE_NAMES.PREFIX_TREE])
-      .objectStore(OBJECT_STORE_NAMES.PREFIX_TREE);
-
-    const treeDataRequest = objectStore.getAll();
-
-    treeDataRequest.onsuccess = (event) => {
-      const queryResult = (event.target as IDBRequest<PrefixTreeNode[]>)
-        .result[0];
-
-      resolve(queryResult);
-    };
-
-    treeDataRequest.onerror = () => reject();
-  });
-}
-
-export function updateOrCreateDB(event: Event) {
-  const target = event.target as unknown as IDBOpenEventTarget;
-  const db = target.result;
-
-  if (db.objectStoreNames.contains(OBJECT_STORE_NAMES.PREFIX_TREE)) {
-    db.deleteObjectStore(OBJECT_STORE_NAMES.PREFIX_TREE);
-  }
-
-  db.createObjectStore(OBJECT_STORE_NAMES.PREFIX_TREE, {
-    keyPath: 'recordKey'
-  });
 }
