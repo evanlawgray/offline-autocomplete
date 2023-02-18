@@ -1,10 +1,11 @@
 import { persistPrefixTree } from '@util/indexedDB/persistPrefixTree';
-import { prefixTreeSingleton } from '@util/prefix-tree';
+import { AutocompleteStore } from '@util/autocomplete-store';
 import React, { useCallback, useState } from 'react';
 
 const INPUT_ID = 'search-input';
 
 interface ISearchBarProps {
+  autoCompleteStore: typeof AutocompleteStore;
   setErrors: (errors: string | string[]) => void;
 }
 
@@ -21,29 +22,31 @@ export const SearchBar = (props: ISearchBarProps) => {
       } = event;
       setSearchTerm(text);
 
-      const newOptions = prefixTreeSingleton.getAllWithPrefix(text);
+      const newOptions = props.autoCompleteStore
+        .getInstance()
+        .getAllWithPrefix(text);
 
       setOptions(newOptions ?? []);
     },
-    [prefixTreeSingleton, setSearchTerm, setOptions]
+    [props.autoCompleteStore, setSearchTerm, setOptions]
   );
 
-  const handleSelect = useCallback(
-    (text: string) => {
-      setSearchTerm(text);
-    },
-    [prefixTreeSingleton]
-  );
+  const handleSelect = useCallback((text: string) => {
+    setSearchTerm(text);
+  }, []);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      prefixTreeSingleton.insert(searchTerm);
+      props.autoCompleteStore.getInstance().insert(searchTerm);
 
-      persistPrefixTree(prefixTreeSingleton.toRawObject(), props.setErrors);
+      persistPrefixTree(
+        props.autoCompleteStore.getInstance().toRawObject(),
+        props.setErrors
+      );
     },
-    [searchTerm, prefixTreeSingleton]
+    [searchTerm, props.autoCompleteStore]
   );
 
   return (

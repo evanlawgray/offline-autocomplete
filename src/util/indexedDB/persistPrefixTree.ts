@@ -14,7 +14,6 @@ export function persistPrefixTree(
     'readwrite'
   );
   const objectStore = transaction.objectStore(OBJECT_STORE_NAMES.PREFIX_TREE);
-
   const updateRequest = objectStore.put(treeData);
 
   updateRequest.onerror = (error) => storeErrors(`${error}`);

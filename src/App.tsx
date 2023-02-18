@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { SearchBar } from '@components/search-bar';
+import { AutocompleteStore } from '@util/autocomplete-store';
 import { initDB } from '@util/indexedDB';
 
 import './App.css';
@@ -20,7 +21,8 @@ function App() {
     setErrors(newState);
   };
 
-  // Initialize indexedDB instance on page load (must only be called once
+  // Initialize indexedDB instance on page load and inject
+  // stored values from indexedDB into in-memory Autocomplete store.
   useEffect(() => {
     window.addEventListener('load', () => {
       initDB(handleSetErrors);
@@ -29,7 +31,10 @@ function App() {
 
   return (
     <div className="main-content">
-      <SearchBar setErrors={handleSetErrors} />
+      <SearchBar
+        autoCompleteStore={AutocompleteStore}
+        setErrors={handleSetErrors}
+      />
     </div>
   );
 }

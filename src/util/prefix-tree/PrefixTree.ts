@@ -1,4 +1,4 @@
-import { OptionsDataStore, PrefixTreeNode } from '@type/index';
+import { PrefixTreeNode } from '@type/index';
 
 export class Node implements PrefixTreeNode {
   value: string | null;
@@ -12,7 +12,7 @@ export class Node implements PrefixTreeNode {
   }
 }
 
-export class PrefixTree implements OptionsDataStore {
+export class PrefixTree {
   root: PrefixTreeNode;
 
   constructor(
